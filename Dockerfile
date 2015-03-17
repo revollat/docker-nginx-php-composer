@@ -15,7 +15,11 @@ RUN sed -i -e 's/\/var\/www:\/usr\/sbin\/nologin/\/var\/www:\/bin\/bash/' /etc/p
 # CONF PHP-FPM
 RUN sed -i "s/^listen\s*=.*$/listen = 127.0.0.1:9000/" /etc/php5/fpm/pool.d/www.conf
 RUN sed -i "s/display_errors = .*/display_errors = On/" /etc/php5/fpm/php.ini
+RUN sed -i "s/;date.timezone.*/date.timezone = Europe\/Paris/" /etc/php5/fpm/php.ini && \
 
+# CONF PHP-CLI
+RUN sed -i "s/;date.timezone.*/date.timezone = Europe\/Paris/" /etc/php5/cli/php.ini && \
+	
 # CONF Nginx 
 ADD vhost.conf /etc/nginx/sites-enabled/default
 
