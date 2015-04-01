@@ -14,8 +14,14 @@ RUN sed -i -e 's/\/var\/www:\/usr\/sbin\/nologin/\/var\/www:\/bin\/bash/' /etc/p
 
 # CONF PHP-FPM
 RUN sed -i "s/^listen\s*=.*$/listen = 127.0.0.1:9000/" /etc/php5/fpm/pool.d/www.conf
-RUN sed -i "s/display_errors = .*/display_errors = stderr/" /etc/php5/fpm/php.ini
-RUN sed -i "s/;date.timezone.*/date.timezone = Europe\/Paris/" /etc/php5/fpm/php.ini
+
+RUN sed -i "s/display_errors = .*/display_errors = stderr/" /etc/php5/fpm/php.ini && \
+    sed -i "s/memory_limit = .*/memory_limit = 2048M/" /etc/php5/fpm/php.ini && \
+    sed -i "s/;date.timezone.*/date.timezone = Europe\/Paris/" /etc/php5/fpm/php.ini && \
+    sed -i "s/max_execution_time = .*/max_execution_time = 300/" /etc/php5/fpm/php.ini && \
+    sed -i "s/max_input_time = .*/max_input_time = 300/" /etc/php5/fpm/php.ini && \
+    sed -i "s/post_max_size = .*/post_max_size = 32M/" /etc/php5/fpm/php.ini && \
+    sed -i "s/upload_max_filesize = .*/upload_max_filesize = 32M/" /etc/php5/fpm/php.ini
 
 # CONF PHP-CLI
 RUN sed -i "s/;date.timezone.*/date.timezone = Europe\/Paris/" /etc/php5/cli/php.ini
