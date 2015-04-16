@@ -15,8 +15,15 @@ RUN mkdir /nodejs && curl http://nodejs.org/dist/v0.12.2/node-v0.12.2-linux-x64.
 ENV PATH $PATH:/nodejs/bin
 RUN npm install -g bower grunt-cli
 
+RUN apt-get install --no-install-recommends -y ruby 
+RUN gem install sass
+
 # Allow shell for www-data (to make composer commands)
 RUN sed -i -e 's/\/var\/www:\/usr\/sbin\/nologin/\/var\/www:\/bin\/bash/' /etc/passwd
+
+# UMASK par defaut
+RUN sed -i -e 's/^UMASK *[0-9]*.*/UMASK    002/' /etc/login.defs
+RUN sed -i -e '/^ENV_PATH/ s/$/:\/nodejs\/bin/' /etc/login.defs
 
 # CONF PHP-FPM
 RUN sed -i "s/^listen\s*=.*$/listen = 127.0.0.1:9000/" /etc/php5/fpm/pool.d/www.conf
@@ -39,11 +46,13 @@ ADD vhost.conf /etc/nginx/sites-enabled/default
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
 RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
+RUN git config --global url."https://".insteadOf git://
+
 # SUPERVISOR
 ADD supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 
 # Script pour démarrer session shell www-data
-ADD start-www-data-session.sh /www-data.sh
+#ADD start-www-data-session.sh /www-data.sh
 
 WORKDIR /var/www
 
