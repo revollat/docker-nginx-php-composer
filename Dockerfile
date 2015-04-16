@@ -4,10 +4,16 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN echo "Europe/Paris" > /etc/timezone; dpkg-reconfigure tzdata
 
 RUN apt-get update -y
-RUN apt-get install -y git curl php5-cli php5-json php5-fpm php5-intl php5-curl php5-mysql php5-gd nginx supervisor
+RUN apt-get install --no-install-recommends -y python build-essential git ca-certificates curl php5-cli php5-json php5-fpm php5-intl php5-curl php5-mysql php5-gd nginx supervisor
 
+# Composer
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
+
+# NodeJS + bower + grunt
+RUN mkdir /nodejs && curl http://nodejs.org/dist/v0.12.2/node-v0.12.2-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+ENV PATH $PATH:/nodejs/bin
+RUN npm install -g bower grunt-cli
 
 # Allow shell for www-data (to make composer commands)
 RUN sed -i -e 's/\/var\/www:\/usr\/sbin\/nologin/\/var\/www:\/bin\/bash/' /etc/passwd
@@ -35,6 +41,9 @@ RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
 # SUPERVISOR
 ADD supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+
+# Script pour démarrer session shell www-data
+ADD start-www-data-session.sh /www-data.sh
 
 WORKDIR /var/www
 
